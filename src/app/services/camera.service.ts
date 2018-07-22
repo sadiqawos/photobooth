@@ -37,15 +37,14 @@ export class CameraService {
 
   takePhoto(callback, burst = 0) {
     if (!CameraService.camera) {
-      console.error('Camera not initialized');
-      return;
+      return callback('Camera not initialized');
     }
     // Take picture with camera object obtained from list()
     CameraService.camera.takePicture({ download: true }, function (er, data) {
       let fileName = Math.round(new Date().getTime() / 1000) + '.jpg';
       let file = path.join(__dirname, '/../../public/', fileName);
       fs.writeFileSync(file, data);
-      if (callback) callback(file);
+      if (callback) callback(undefined, file);
     });
   }
 }

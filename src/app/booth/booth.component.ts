@@ -1,9 +1,15 @@
-import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild, HostListener } from '@angular/core';
 import { CameraService } from '../services/camera.service';
 import { FacebookService } from '../services/facebook.service';
 import { PrintService } from '../services/print.service';
 import { FormControl, Validators } from '@angular/forms';
 import { ConfigService } from '../services/config.service';
+
+export enum KEY_CODE {
+  RIGHT_ARROW = 39,
+  LEFT_ARROW = 37,
+  SPACE_BAR = 32
+}
 
 @Component({
   selector: 'app-booth',
@@ -34,8 +40,14 @@ export class BoothComponent implements OnInit {
 
   ngOnInit() {
     this._cameraService.init();
-    this.resetTimer();
     this.printers = this._printService.getPrinters();
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    if (event.keyCode === KEY_CODE.SPACE_BAR) {
+      this.startTimer();
+    }
   }
 
   startTimer(): any {
@@ -48,16 +60,28 @@ export class BoothComponent implements OnInit {
       if (this.timer.value > 1) {
         this.timer.value --;
       } else {
-        // Send shutter release command to python code
-        this._cameraService.takePhoto(file => {
+        // Send shutter release command
+        clearInterval(this.timer.id);
+        this._cameraService.takePhoto((err, file) => {
+          if (err) {
+            console.error(err);
+            this.resetTimer();
+            return;
+          }
+          // update ui
           this._ngZone.run(() => {
             this.images.push({src: file});
-            this.images.push({src: file});
-            this.images.push({src: file});
+            this.hide = true;
           });
+
+          // print
+          this._printService.print((success: boolean) => {
+            this.hide = false;
+          }, this._config.getPrinterName());
+
+          // reset ui
+          this.resetTimer();
         }, 3);
-        clearInterval(this.timer.id);
-        this.resetTimer();
       }
     }, 1000);
   }
@@ -69,14 +93,6 @@ export class BoothComponent implements OnInit {
       id: null
     }
     this.images.length = 0;
-    this.images.push({ src: "/home/sadiq/Workspace/photobooth/public/IMG_20180504_090308.jpg" });
-  }
-  
-  print() {
-    this.hide = true;
-    this._printService.print((success: boolean) => {
-      this.hide = false;
-    }, this._config.getPrinterName());
   }
 
   selectPrinter(name) {
