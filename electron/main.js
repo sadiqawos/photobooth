@@ -46,13 +46,9 @@ function createWindow() {
     authWindow.loadURL(facebookAuthURL);
     authWindow.show();
     authWindow.webContents.on('did-get-redirect-request', function (event, oldUrl, newUrl) {
-      console.log('oldUrl', oldUrl);
-      console.log('newUrl', newUrl);
       var raw_code = /access_token=([^&]*)/.exec(newUrl) || null;
       var access_token = (raw_code && raw_code.length > 1) ? raw_code[1] : null;
       var error = /\?error=(.+)$/.exec(newUrl);
-
-      console.log('accesToken', access_token, 'error', error);
       if (access_token) {
         e.sender.send('fb-token', access_token);
         authWindow.close();
@@ -75,3 +71,4 @@ app.on('activate', function () {
     createWindow();
   }
 });
+
