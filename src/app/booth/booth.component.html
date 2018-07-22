@@ -10,10 +10,10 @@
     <span class="title">2018</span>
   </div>
   <div class="center-middle">
-    <!-- <div *ngFor="let image of images">
+    <div *ngFor="let image of images" class="placeholder">
       <img [src]="image.src" class="image">
-    </div> -->
-    <div class="placeholder">
+    </div>
+    <div *ngIf="images.length < 1" class="placeholder">
       <fa name="camera" size="5x"></fa>
     </div>
   </div>
