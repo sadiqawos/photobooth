@@ -5,16 +5,24 @@
 
 <!-- photobooth content -->
 <div class="container">
-  <div class="center">
+  <div class="center-top">
     <span class="title">Lauralee & Adam</span>
     <span class="title">2018</span>
-    <div *ngFor="let image of images">
+  </div>
+  <div class="center-middle">
+    <!-- <div *ngFor="let image of images">
       <img [src]="image.src" class="image">
+    </div> -->
+    <div class="placeholder">
+      <fa name="camera" size="5x"></fa>
     </div>
   </div>
 
-  <div>
+  <div class="center-bottom">
     <!-- camera controls -->
+    <div class="col-lg-12 text-center">
+      <div class="btn" (click)="startTimer()">START</div>
+    </div>
   </div>
 </div>
 
@@ -28,11 +36,65 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        This is static modal, backdrop click will not close it. Click
-        <b>&times;</b> to close modal.
+      <div class="modal-body config">
+        <form class="col-lg-12">
+          <!-- Camera source -->
+          <div class="config-prop-title">
+            <span>Select Camera Source</span>
+          </div>
+          <div class="btn-group" btnRadioGroup [(ngModel)]="config.cameraSource" [ngModelOptions]="{standalone: true}">
+            <label class="btn btn-primary" name="dslr" btnRadio="dslr" tabindex="0" role="button">DSLR</label>
+            <label class="btn btn-primary" name="webcam" btnRadio="webcam" tabindex="0" role="button">Webcam</label>
+          </div>
 
-        <button class="btn btn-primary" (click)="fbLogin()">facebook login</button>
+          <!-- Camera model -->
+          <div class="config-prop-title" *ngIf="config.cameraSource === 'dslr'">
+            <span>Select Camera Model</span>
+          </div>
+          <div class="btn-group" dropdown *ngIf="config.cameraSource === 'dslr'">
+            <button id="button-basic" dropdownToggle type="button" class="btn btn-primary dropdown-toggle" aria-controls="dropdown-basic">
+              {{ config.cameraModel || 'Model' }} <span class="caret"></span>
+            </button>
+            <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"role="menu" aria-labelledby="button-basic">
+              <li role="menuitem" *ngFor="let camera of cameras"><a class="dropdown-item" (click)="config.cameraModel = camera.name">{{ 'camera.name' }}</a></li>
+            </ul>
+          </div>
+
+          <!-- Save location -->
+          <div class="config-prop-title">
+            <span>Save photos to? </span><span *ngIf="config.autoSaveDir">({{ config.autoSaveDir }})</span>
+          </div>
+          <div>
+            <label class="fileContainer btn btn-primary">
+              <fa name="folder"></fa> Select Folder
+              <input type="file" #file (change)="onDirSelected()" directory webkitdirectory mozdirectory>
+            </label>
+          </div>
+
+          <!-- Printer drop down -->
+          <div class="config-prop-title">
+            <span>Select Printer</span>
+          </div>
+          <div class="btn-group" dropdown>
+            <button id="button-basic" dropdownToggle type="button" class="btn btn-primary dropdown-toggle" aria-controls="dropdown-basic">
+              {{ config.selectedPrinter || 'Printer' }} <span class="caret"></span>
+            </button>
+            <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"role="menu" aria-labelledby="button-basic">
+              <li role="menuitem" *ngFor="let printer of printers"><a class="dropdown-item" (click)="selectPrinter(printer.name)">{{ printer.name }}</a></li>
+            </ul>
+          </div>
+
+          <!-- Facebook login -->
+          <div class="config-prop-title">
+            <span>Sign In with Facebook</span>
+          </div>
+          <div>
+            <button class="btn btn-primary" (click)="fbLogin()">Login</button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="saveConfig(); staticModal.hide()">Save</button>
       </div>
     </div>
   </div>
@@ -51,22 +113,12 @@
 
     <div class="row text-center">
       <!-- open settings modal -->
-      <a (click)="staticModal.show()">Settings</a>
+      <a (click)="staticModal.show()"><fa name="cog" animation="spin"></fa>Settings</a>
     </div>
   </div>
 </footer>
 
 <!-- To do 
-  Add floating footer to display instructions
-  Add buttons to footer
-  Style buttons (bootstrap)
-  Add proper place holder image (Maybe a image of a camera)
-  Decide on how many images to display 
-
-  Side bar/Modal (ngx-bootstrap)
-  - Add side bar to setup facebook login
+  - Decide on how many images to display
   - Select burst mode
-  - Webcam maybe? DSLR config?
-  - Select printer
-  - Select save directory
 -->
