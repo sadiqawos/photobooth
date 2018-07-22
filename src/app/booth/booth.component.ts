@@ -1,7 +1,9 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
 import { CameraService } from '../services/camera.service';
 import { FacebookService } from '../services/facebook.service';
 import { PrintService } from '../services/print.service';
+import { FormControl, Validators } from '@angular/forms';
+import { ConfigService } from '../services/config.service';
 
 @Component({
   selector: 'app-booth',
@@ -16,20 +18,24 @@ export class BoothComponent implements OnInit {
   };
 
   hide = false;
-
-  sampleImage = { src: "/home/sadiq/Workspace/photobooth/public/IMG_20180504_090308.jpg" };
-
   images = [];
+  printers = [];
+  config;
+  @ViewChild('file') file;
 
   constructor(
     private _cameraService: CameraService,
     private _ngZone: NgZone,
     private _facebook: FacebookService,
-    private _printService: PrintService) {}
+    private _printService: PrintService,
+    private _config: ConfigService) {
+      this.config = _config.getConfig();
+    }
 
   ngOnInit() {
     this._cameraService.init();
     this.resetTimer();
+    this.printers = this._printService.getPrinters();
   }
 
   startTimer(): any {
@@ -62,18 +68,36 @@ export class BoothComponent implements OnInit {
       value: 5,
       id: null
     }
-    this.images.length = 0; //clear all images
-    this.images.push(this.sampleImage);
+    this.images.length = 0;
+    this.images.push({ src: "/home/sadiq/Workspace/photobooth/public/IMG_20180504_090308.jpg" });
   }
   
   print() {
     this.hide = true;
     this._printService.print((success: boolean) => {
       this.hide = false;
-    });
+    }, this._config.getPrinterName());
+  }
+
+  selectPrinter(name) {
+    this._config.setPrinterName(name);
   }
 
   fbLogin() {
-    this._facebook.getToken();
+    this._facebook.getToken(token => {
+      this._config.setFacebookToken(token);
+    });
+  }
+
+  saveConfig() {
+    this._config.save();
+  }
+
+  onDirSelected() {
+    const files: { [key: string]: File } = this.file.nativeElement.files;
+
+    if (files && files[0]) {
+      this._config.setSaveDir(files[0].path);
+    }
   }
 }

@@ -10,21 +10,16 @@ export class FacebookService {
   clientId: string = '2134058110169721';
   redirectUrl: string = 'https://www.facebook.com/connect/login_success.html';
 
-  constructor(private _electronService: ElectronService) {
-    let access_token = localStorage.getItem('fb-token');
+  constructor(private _electronService: ElectronService) {}
 
-    if (access_token) {
-      console.log(access_token);
-      this.setAccessToken(access_token);
-    }
+  init(token: string) {
+    this.setAccessToken(token);
   }
 
-  getToken() {
+  getToken(callback) {
     this._electronService.ipcRenderer.on('fb-token', (event, arg) => {
       let access_token = arg;
-      localStorage.setItem('fb-token', access_token);
-      
-      this.setAccessToken(access_token);
+      callback(access_token);
     });
 
     this._electronService.ipcRenderer.send('fb-authenticate', {
@@ -33,10 +28,8 @@ export class FacebookService {
     });
   }
 
-  setAccessToken(access_token) {
+  private setAccessToken(access_token) {
     FB.setAccessToken(access_token);
-
-    this.testApi();
   }
 
   testApi() {

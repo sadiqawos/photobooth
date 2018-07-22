@@ -12,13 +12,17 @@ export class PrintService {
   /**
    * Print the currently displayed web content
    * @param callback
+   * @param printerName
    */
-  print(callback) {
+  print(callback, printerName: string = null) {
     let window = this._electronService.remote.getCurrentWebContents();
+    let defaultPrinter = this.getPrinters().find(f => {
+      return f.isDefault;
+    });
 
     window.print({
       silent: true,
-      deviceName: 'Canon-MX470-series'
+      deviceName: printerName || defaultPrinter.name
     }, callback);
   }
 
