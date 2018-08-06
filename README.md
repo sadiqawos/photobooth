@@ -6,6 +6,8 @@ Requirements:
 - angular-cli
 - electron
 
+*For r-pi: follow [link](https://medium.com/@cgulabrani/controlling-your-dslr-through-raspberry-pi-ad4896f5e225) to build libgphoto2 from source
+
 Build:
 - Install dependencies `npm install`
 - Build `ng build` for production `ng build --prod`
