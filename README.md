@@ -5,6 +5,7 @@ Requirements:
 - libgphoto2 (brew install libgphoto2, apt-get install libgphoto2-dev  or download and build from http://www.gphoto.org/proj/libgphoto2/)
 - angular-cli
 - electron
+- Imagemagick cmd line tool `sudo apt-get install imagemagick graphicsmagick`
 
 *For r-pi: follow [link](https://medium.com/@cgulabrani/controlling-your-dslr-through-raspberry-pi-ad4896f5e225) to build libgphoto2 from source
 
