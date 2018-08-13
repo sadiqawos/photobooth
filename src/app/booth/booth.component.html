@@ -4,24 +4,32 @@
 </div>
 
 <!-- photobooth content -->
-<div class="container">
-  <div class="center-top">
+<div class="container" [style.padding-top.px]="hide ? 0 : 30">
+  <div *ngIf="!hide" class="center-top">
     <span class="title">Lauralee & Adam</span>
     <span class="title">2018</span>
   </div>
+
   <div class="center-middle">
-    <div *ngFor="let image of images" class="placeholder">
+    <div *ngFor="let image of images" class="placeholder" [style.top.%]="hide ? 10 : 30">
       <img [src]="image.src" class="image">
+      
+      <!-- For polariod looking print -->
+      <div *ngIf="hide" class="center-top">
+        <span class="title">Lauralee & Adam 2018</span>
+      </div>
     </div>
-    <div *ngIf="images.length < 1" class="placeholder">
+    <div *ngIf="images.length < 1" class="placeholder" style="top: 30%">
       <fa name="camera" size="5x"></fa>
     </div>
   </div>
 
-  <div class="center-bottom">
+  <div *ngIf="!hide" class="center-bottom">
     <!-- camera controls -->
     <div class="col-lg-12 text-center">
-      <div class="btn" (click)="startTimer()">START</div>
+      <div *ngIf="images.length < 1" class="btn" (click)="startTimer()">START</div>
+      <div *ngIf="images.length > 0" class="btn" (click)="print()">PRINT</div>
+      <div *ngIf="images.length > 0" class="btn" (click)="resetState(); startTimer()">TRY AGAIN</div>
     </div>
   </div>
 </div>
@@ -56,7 +64,7 @@
               {{ config.cameraModel || 'Model' }} <span class="caret"></span>
             </button>
             <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"role="menu" aria-labelledby="button-basic">
-              <li role="menuitem" *ngFor="let camera of cameras"><a class="dropdown-item" (click)="config.cameraModel = camera.name">{{ 'camera.name' }}</a></li>
+              <li role="menuitem" *ngFor="let camera of cameras"><a class="dropdown-item" (click)="config.cameraModel = camera.model">{{ camera.model }}</a></li>
             </ul>
           </div>
 
@@ -106,8 +114,8 @@
     <div class="row text-center">
       <!-- instructions -->
       <ul class="footernavLinks text-center">
-        <li>1. Hit the <span style="color: green;">Green</span> space bar</li>
-        <li>2. Once the timer starts You'll have 5 seconds to come up with your best "I'm having fun face!"</li>
+        <li>Press the <span style="color: green;">Green</span> button to begin timer</li>
+        <li>You'll have 5 seconds to come up with your best "I'm having fun face!"</li>
       </ul>
     </div>
 
@@ -121,4 +129,5 @@
 <!-- To do 
   - Decide on how many images to display
   - Select burst mode
+  - Maybe a way to enter a thank you message
 -->

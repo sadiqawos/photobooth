@@ -6,8 +6,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { ConfigService } from '../services/config.service';
 
 export enum KEY_CODE {
-  RIGHT_ARROW = 39,
-  LEFT_ARROW = 37,
+  ENTER = 13,
   SPACE_BAR = 32
 }
 
@@ -26,6 +25,7 @@ export class BoothComponent implements OnInit {
   hide = false;
   images = [];
   printers = [];
+  cameras = [];
   config;
   @ViewChild('file') file;
 
@@ -35,18 +35,27 @@ export class BoothComponent implements OnInit {
     private _facebook: FacebookService,
     private _printService: PrintService,
     private _config: ConfigService) {
-      this.config = _config.getConfig();
-    }
+    this.config = _config.getConfig();
+  }
 
   ngOnInit() {
-    this._cameraService.init();
+    this._cameraService.init(cameras => {
+      this.cameras = cameras;
+    });
     this.printers = this._printService.getPrinters();
   }
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
-    if (event.keyCode === KEY_CODE.SPACE_BAR) {
+    if (event.keyCode === KEY_CODE.SPACE_BAR) { // reset and start
+
+      // This means we are waiting to print something
+      if (this.images.length > 0) {
+        this.resetState();
+      }
       this.startTimer();
+    } else if (event.keyCode === KEY_CODE.ENTER) { // print
+      this.print();
     }
   }
 
@@ -58,30 +67,27 @@ export class BoothComponent implements OnInit {
 
     this.timer.id = setInterval(() => {
       if (this.timer.value > 1) {
-        this.timer.value --;
+        this.timer.value--;
       } else {
-        // Send shutter release command
         clearInterval(this.timer.id);
+        this.timer.value = null;
+        // Send shutter release command
         this._cameraService.takePhoto((err, file) => {
           if (err) {
             console.error(err);
-            this.resetTimer();
+            this.resetState();
             return;
           }
+
           // update ui
           this._ngZone.run(() => {
-            this.images.push({src: file});
-            this.hide = true;
+            // reset ui/hide countdown 
+            this.resetState();
+            
+            // display new image 
+            this.images.push({ src: file });
           });
-
-          // print
-          this._printService.print((success: boolean) => {
-            this.hide = false;
-          }, this._config.getPrinterName());
-
-          // reset ui
-          this.resetTimer();
-        }, 3);
+        }, this._config.getSaveDir(), 3);
       }
     }, 1000);
   }
@@ -92,6 +98,27 @@ export class BoothComponent implements OnInit {
       value: 5,
       id: null
     }
+  }
+
+  print() {
+    if (this.hide || this.images.length < 1) {
+      return; // another print is in-progress or no images to print
+    }
+    //hide elements we dont want to print
+    this.hide = true;
+
+    // print
+    this._printService.print((success: boolean) => {
+      this._ngZone.run(() => {
+        // unhide elements
+        this.hide = false;
+        this.resetState();
+      });
+    }, this._config.getPrinterName());
+  }
+
+  resetState(): any {
+    this.resetTimer();
     this.images.length = 0;
   }
 

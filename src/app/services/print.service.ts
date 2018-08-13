@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ElectronService } from 'ngx-electron';
+const fs = (<any>window).require("fs");
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,6 @@ export class PrintService {
     let defaultPrinter = this.getPrinters().find(f => {
       return f.isDefault;
     });
-
     window.print({
       silent: true,
       deviceName: printerName || defaultPrinter.name
