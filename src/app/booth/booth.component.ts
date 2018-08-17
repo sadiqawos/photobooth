@@ -56,7 +56,7 @@ export class BoothComponent implements OnInit {
     if (event.keyCode === KEY_CODE.SPACE_BAR) { // reset and start
 
       // This means we are waiting to print something
-      if (this.images.length > 0) {
+      if (this.images.length == 3 && !this.timer.isActive) {
         this.resetState();
       }
       this.startTimer();
@@ -73,10 +73,10 @@ export class BoothComponent implements OnInit {
     }
   }
 
-  startTimer(): any {
-    // if (this.timer.isActive || this.shutterCount == 2) {
-    //   return;
-    // }
+  startTimer(overide = false): any {
+    if (this.timer.isActive && !overide) {
+      return;
+    }
     this.timer.isActive = true;
 
     this.timer.id = setInterval(() => {
@@ -98,12 +98,11 @@ export class BoothComponent implements OnInit {
 
         if (this.shutterCount < 2) {
           this.timer.value = 5;
-          this.timer.isActive = false;
-          this.startTimer();
+          this.shutterCount++;
+          this.startTimer(true);
         } else {
           this.resetTimer();
         }
-        this.shutterCount++;
       }
     }, 1000);
   }
@@ -138,6 +137,7 @@ export class BoothComponent implements OnInit {
     this.resetTimer();
     this.images.length = 0;
     this.shutterCount = 0;
+    this.printCount = 1;
   }
 
   selectPrinter(name) {
