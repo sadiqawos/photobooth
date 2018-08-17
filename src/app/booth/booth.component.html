@@ -5,31 +5,17 @@
 
 <!-- photobooth content -->
 <div class="container" [style.padding-top.px]="hide ? 0 : 30">
-  <div *ngIf="!hide" class="center-top">
+  <div class="center-top">
     <span class="title">Lauralee & Adam</span>
-    <span class="title">2018</span>
+    <span class="title" [ngClass]="{'lowfont': hide}">2018</span>
   </div>
 
   <div class="center-middle">
-    <div *ngFor="let image of images" class="placeholder" [style.top.%]="hide ? 10 : 30">
+    <div *ngFor="let image of images" [style.top.%]="hide ? 10 : 30">
       <img [src]="image.src" class="image">
-      
-      <!-- For polariod looking print -->
-      <div *ngIf="hide" class="center-top lowfont">
-        <span class="title">Lauralee & Adam 2018</span>
-      </div>
     </div>
     <div *ngIf="images.length < 1" class="placeholder" style="top: 30%">
       <fa name="camera" size="5x"></fa>
-    </div>
-  </div>
-
-  <div *ngIf="!hide" class="center-bottom">
-    <!-- camera controls -->
-    <div class="col-lg-12 text-center">
-      <div *ngIf="images.length < 1" class="btn" (click)="startTimer()" style="color: green;">START</div>
-      <div *ngIf="images.length > 0" class="btn" (click)="print()" style="color: blue;">PRINT</div>
-      <div *ngIf="images.length > 0" class="btn" (click)="resetState(); startTimer()" style="color: green;">TRY AGAIN</div>
     </div>
   </div>
 </div>
@@ -108,18 +94,45 @@
   </div>
 </div>
 
+<!-- Printer Modal -->
+<div class="modal fade" bsModal #printModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-static-name" class="modal-title pull-left">Print</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="printModal.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body config">
+        <form class="col-lg-12">
+          <div class="print_modal_key">
+            How many copies do you want?
+          </div>
+          <div class="print_modal_value">
+            {{ printCount }}
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="print(); printModal.hide()">Print</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Footer -->
 <footer *ngIf="!hide" class="footernav navbar-fixed-bottom col-lg-12">
   <div class="container-fluid text-center">
     <div class="row text-center">
-      <!-- instructions -->
-      <ul class="footernavLinks text-center">
-        <li>Press the <span style="color: green;">Green</span> button to begin timer</li>
-        <li>You'll have 5 seconds to come up with your best "I'm having fun face!"</li>
-      </ul>
-    </div>
-
-    <div class="row text-center">
+        <div *ngIf="!hide" class="center-bottom">
+            <!-- camera controls -->
+            <div class="col-lg-12 text-center">
+              <div *ngIf="images.length < 1" class="btn" (click)="startTimer()" style="color: green;">START</div>
+              <div *ngIf="images.length > 2" class="btn" (click)="printModal.show()" style="color: blue;">PRINT</div>
+              <div *ngIf="images.length > 2" class="btn" (click)="resetState(); startTimer()" style="color: green;">TRY AGAIN</div>
+            </div>
+          </div>
       <!-- open settings modal -->
       <a (click)="staticModal.show()"><fa name="cog" animation="spin"></fa>Settings</a>
     </div>
@@ -130,4 +143,11 @@
   - Decide on how many images to display
   - Select burst mode
   - Maybe a way to enter a thank you message
+
+  - Make photos smaller 
+  - Make paper smaller
+  - Make Title bigger
+  - Reduce white paper gap
+  - Add sound
+  - Write instructions
 -->
