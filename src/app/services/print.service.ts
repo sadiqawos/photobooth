@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { ElectronService } from 'ngx-electron';
-const fs = (<any>window).require("fs");
 
 @Injectable({
   providedIn: 'root'

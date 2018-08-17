@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 const gphoto2 = (<any>window).require("gphoto2");
 const path = (<any>window).require("path");
-const im = (<any>window).require('imagemagick');
 const fs = (<any>window).require('fs');
 
 @Injectable({
