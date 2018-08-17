@@ -1,9 +1,11 @@
-import { Component, OnInit, NgZone, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild, HostListener, TemplateRef, ElementRef } from '@angular/core';
 import { CameraService } from '../services/camera.service';
 import { FacebookService } from '../services/facebook.service';
 import { PrintService } from '../services/print.service';
 import { FormControl, Validators } from '@angular/forms';
 import { ConfigService } from '../services/config.service';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
 export enum KEY_CODE {
   ENTER = 13,
@@ -32,14 +34,18 @@ export class BoothComponent implements OnInit {
   printers = [];
   cameras = [];
   config;
+
   @ViewChild('file') file;
+  @ViewChild('showPrint') showPrint : ElementRef;
+  @ViewChild('printModal') printModal;
 
   constructor(
     private _cameraService: CameraService,
     private _ngZone: NgZone,
     private _facebook: FacebookService,
     private _printService: PrintService,
-    private _config: ConfigService) {
+    private _config: ConfigService,
+    private modalService: BsModalService) {
     this.config = _config.getConfig();
   }
 
@@ -54,14 +60,20 @@ export class BoothComponent implements OnInit {
   keyEvent(event: KeyboardEvent) {
     // console.log(event.keyCode)
     if (event.keyCode === KEY_CODE.SPACE_BAR) { // reset and start
-
+      if (this.printModal.isShown) {
+        this.printModal.hide();
+        this.print();
+        return;
+      }
       // This means we are waiting to print something
       if (this.images.length == 3 && !this.timer.isActive) {
-        this.resetState();
+        this.triggerFalseClick();
+        return;
       }
       this.startTimer();
     } else if (event.keyCode === KEY_CODE.ENTER) {
-      this.print();
+      this.resetState();
+      this.startTimer();
     } else if (event.keyCode === KEY_CODE.LEFT) {
       if (this.printCount > 1) {
         this.printCount--;
@@ -81,6 +93,9 @@ export class BoothComponent implements OnInit {
 
     this.timer.id = setInterval(() => {
       if (this.timer.value > 1) {
+        if (!this.timer.isActive) {
+          clearInterval(this.timer.id);
+        }
         this.timer.value--;
       } else {
         clearInterval(this.timer.id);
@@ -135,6 +150,10 @@ export class BoothComponent implements OnInit {
 
   resetState(): any {
     this.resetTimer();
+    if (this.timer.id) {
+      clearInterval(this.timer.id);
+      this.timer.id = null;
+    }
     this.images.length = 0;
     this.shutterCount = 0;
     this.printCount = 1;
@@ -160,5 +179,10 @@ export class BoothComponent implements OnInit {
     if (files && files[0]) {
       this._config.setSaveDir(files[0].path);
     }
+  }
+
+  triggerFalseClick() {
+    let el: HTMLElement = this.showPrint.nativeElement as HTMLElement;
+    el.click();
   }
 }

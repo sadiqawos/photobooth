@@ -110,7 +110,10 @@
             How many copies do you want?
           </div>
           <div class="print_modal_value">
-            {{ printCount }}
+            <span class="add_min">-</span>{{ printCount }}<span class="add_min">+</span>
+          </div>
+          <div class="print_modal_key">
+            Use the <span style="color: blue;">left</span> and <span style="color: blue;">right</span> arrow keys to select copies to print. Use the <span style="color: green;">green</span> button to confirm.
           </div>
         </form>
       </div>
@@ -129,7 +132,7 @@
             <!-- camera controls -->
             <div class="col-lg-12 text-center">
               <div *ngIf="images.length < 1" class="btn" (click)="startTimer()" style="color: green;">START</div>
-              <div *ngIf="images.length > 2" class="btn" (click)="printModal.show()" style="color: blue;">PRINT</div>
+              <div #showPrint *ngIf="images.length > 2" class="btn" (click)="printModal.show()" style="color: blue;">PRINT</div>
               <div *ngIf="images.length > 2" class="btn" (click)="resetState(); startTimer()" style="color: green;">TRY AGAIN</div>
             </div>
           </div>
@@ -140,14 +143,9 @@
 </footer>
 
 <!-- To do 
-  - Decide on how many images to display
-  - Select burst mode
   - Maybe a way to enter a thank you message
 
-  - Make photos smaller 
-  - Make paper smaller
-  - Make Title bigger
-  - Reduce white paper gap
   - Add sound
   - Write instructions
+  - Add stickers to keyboard
 -->
